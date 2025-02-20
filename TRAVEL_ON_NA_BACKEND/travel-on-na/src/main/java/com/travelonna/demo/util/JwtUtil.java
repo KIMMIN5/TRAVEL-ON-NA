@@ -6,6 +6,8 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.travelonna.demo.entity.User;
+
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
@@ -34,7 +36,15 @@ public class JwtUtil {
         return UUID.randomUUID().toString();
     }
     
+    public String generateRefreshToken(User user) {
+        return generateRefreshToken();
+    }
+    
     public Integer getRefreshTokenValidityInSeconds() {
-        return (int) (refreshTokenExpiration / 1000);
+        return 604800; // 7일
+    }
+
+    public String generateAccessToken(User user) {
+        return generateToken(user.getEmail());
     }
 }

@@ -13,7 +13,7 @@ public class LoginResponse {
     @Getter
     @Builder
     public static class UserDto {
-        private String id;
+        private String user_id;
         private String name;
         private String email;
     }

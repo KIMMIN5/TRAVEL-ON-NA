@@ -30,4 +30,4 @@ out/
 .vscode/
 
 ### Sensitive Information ###
-**/application-secret.yml 
+**/application-secret.yml
