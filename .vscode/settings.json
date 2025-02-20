@@ -1,0 +1,7 @@
+{
+    "java.project.sourcePaths": [
+        "TRAVEL_ON_NA_BACKEND/src",
+        "TRAVEL_ON_NA_BACKEND/demo/src/main/java/com/travelonna/demo"
+    ],
+    "java.compile.nullAnalysis.mode": "automatic"
+}
