@@ -19,7 +19,7 @@ public class ProfileService {
     @Autowired
     private ProfileRepository profileRepository;
 
-    @Value("${file.upload-dir}")  // application.properties에서 설정후 여기 작성해줘야함!
+    @Value("${spring.file.upload-dir}")  // application.properties에서 설정후 여기 작성해줘야함!
     private String uploadDir;
 
     public void saveProfile(String nickname, MultipartFile profileImage, String introduction) {
