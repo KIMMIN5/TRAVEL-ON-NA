@@ -11,7 +11,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;  // 추가
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 
 @Configuration
@@ -27,28 +27,36 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .csrf(csrf -> csrf.disable())
-            .sessionManagement(session -> session
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/api/hello", "/oauth2/**", "/login/**", "/oauth/callback").permitAll()
-                .anyRequest().authenticated()
-            )
-            .oauth2Login(oauth2 -> oauth2
-                .userInfoEndpoint(userInfo -> userInfo
-                    .userService(oAuth2UserService)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)) // STATELESS에서 변경
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/", "/api/hello", "/oauth2/**", "/login/**",
+                                "/oauth/callback", "/profile/**", "/css/**",
+                                "/js/**", "/images/**").permitAll()
+                        .anyRequest().authenticated()
                 )
-                .successHandler((request, response, authentication) -> {
-                    OAuth2User oauth2User = (OAuth2User) authentication.getPrincipal();
-                    String email = oauth2User.getAttribute("email");
-                    
-                    // JWT 토큰 생성 등의 로직
-                    
-                    // 테스트용 콜백 페이지로 리다이렉트
-                    response.sendRedirect("/oauth/callback");
-                })
-            );
+                .oauth2Login(oauth2 -> oauth2
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(oAuth2UserService)
+                        )
+                        .successHandler((request, response, authentication) -> {
+                            OAuth2User oauth2User = (OAuth2User) authentication.getPrincipal();
+                            String email = oauth2User.getAttribute("email");
+                            response.sendRedirect("/profile");  // OAuth 로그인 성공 시 프로필 페이지로 리다이렉트
+                        })
+                )
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .permitAll()
+                        .defaultSuccessUrl("/profile", true)  // 폼 로그인 성공 시 프로필 페이지로 리다이렉트
+                        .failureUrl("/login?error=true")
+                )
+                .logout(logout -> logout
+                        .logoutSuccessUrl("/login")
+                        .permitAll()
+                );
 
         return http.build();
     }
@@ -66,17 +74,12 @@ public class SecurityConfig {
         return source;
     }
 
-    @Bean
     public OAuth2UserService<OAuth2UserRequest, OAuth2User> oauth2UserService() {
         DefaultOAuth2UserService delegate = new DefaultOAuth2UserService();
-        
+
         return (userRequest) -> {
             OAuth2User oauth2User = delegate.loadUser(userRequest);
-            
-            // 여기서 사용자 정보를 처리하고 필요한 경우 DB에 저장
             String email = oauth2User.getAttribute("email");
-            // 사용자 처리 로직 추가
-            
             return oauth2User;
         };
     }
