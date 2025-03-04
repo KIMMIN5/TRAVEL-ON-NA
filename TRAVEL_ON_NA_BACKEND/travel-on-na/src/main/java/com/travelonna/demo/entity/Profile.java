@@ -10,21 +10,28 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class Profile {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "profile_id")  // DB 스키마에 맞게 컬럼 이름 지정
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @Column(name = "nickname")
     private String nickname;
+
+    @Column(name = "profile_image")
     private String profileImage;
+
+    @Column(name = "introduction")
     private String introduction;
-    
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
-    
+
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 

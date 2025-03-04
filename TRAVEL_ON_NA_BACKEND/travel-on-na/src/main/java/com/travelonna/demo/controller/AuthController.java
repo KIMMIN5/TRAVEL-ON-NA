@@ -27,4 +27,6 @@ public class AuthController {
     public ResponseEntity<LoginResponse> googleCallback(OAuth2AuthenticationToken authentication) {
         return ResponseEntity.ok(authService.processOAuth2Login(authentication.getPrincipal()));
     }
+
+
 }
