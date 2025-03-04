@@ -5,24 +5,27 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;  // 추가
-import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
+import org.springframework.web.cors.CorsConfigurationSource;  // 추가
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.travelonna.demo.service.AuthService;
+
+import lombok.RequiredArgsConstructor;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
     private final OAuth2UserService oAuth2UserService;
-
-    public SecurityConfig(OAuth2UserService oAuth2UserService) {
-        this.oAuth2UserService = oAuth2UserService;
-    }
+    private final AuthService authService;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -41,12 +44,18 @@ public class SecurityConfig {
                 )
                 .successHandler((request, response, authentication) -> {
                     OAuth2User oauth2User = (OAuth2User) authentication.getPrincipal();
-                    String email = oauth2User.getAttribute("email");
                     
-                    // JWT 토큰 생성 등의 로직
-                    
-                    // 테스트용 콜백 페이지로 리다이렉트
-                    response.sendRedirect("/oauth/callback");
+                    // AuthService의 processOAuth2Login 메서드 호출
+                    try {
+                        var loginResponse = authService.processOAuth2Login(oauth2User);
+                        
+                        // 응답 설정
+                        response.setContentType("application/json");
+                        response.getWriter().write(new ObjectMapper().writeValueAsString(loginResponse));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        response.sendError(500, "로그인 처리 중 오류가 발생했습니다.");
+                    }
                 })
             );
 

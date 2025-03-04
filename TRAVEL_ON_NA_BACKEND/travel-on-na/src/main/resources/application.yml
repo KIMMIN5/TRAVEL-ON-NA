@@ -17,7 +17,7 @@ spring:
       ddl-auto: none    # 자동 테이블 생성 비활성화
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQLDialect  # 공백 제거
+        dialect: org.hibernate.dialect.MySQLDialect
         format_sql: true
         show_sql: true
     naming:
