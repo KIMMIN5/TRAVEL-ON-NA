@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Profile Page</title>
+</head>
+<body>
+<h1>프로필 페이지</h1>
+<p>사용자 이메일: <span th:text="${userEmail}"></span></p>
+<form action="/profile/save" method="post" enctype="multipart/form-data">
+    <label for="nickname">닉네임:</label>
+    <input type="text" id="nickname" name="nickname" required>
+    <br>
+    <label for="profileImage">프로필 이미지:</label>
+    <input type="file" id="profileImage" name="profileImage">
+    <br>
+    <label for="introduction">소개:</label>
+    <textarea id="introduction" name="introduction"></textarea>
+    <br>
+    <button type="submit">프로필 저장</button>
+</form>
+</body>
+</html>
